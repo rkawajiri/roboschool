@@ -266,7 +266,11 @@ struct Joint {
 	    float pos, speed, force_torque[6], motor_torque;
 	    jref->joint_current_position(&pos, &speed, force_torque, &motor_torque);
 
-	    return make_tuple(boost::python::list(force_torque), motor_torque);
+        boost::python::list l;
+        for (int i = 0; i < 6; ++i)
+          l.append(force_torque[i]);
+
+	    return make_tuple(l, motor_torque);
 	}
 
 	boost::python::tuple current_relative_position()
