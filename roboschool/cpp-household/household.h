@@ -86,7 +86,7 @@ struct Joint {
 	void set_target_speed(float target_speed, float kd, float maxforce);
 	void set_servo_target(float target_pos, float target_speed, float kp, float kd, float maxforce);
 
-	void joint_current_position(float* pos, float* speed);
+	void joint_current_position(float* pos, float* speed, float* force_torque, float* motor_torque);
 	void reset_current_position(float pos, float vel);
 
 	void activate();

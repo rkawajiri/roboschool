@@ -300,8 +300,8 @@ public:
 			QDoubleSpinBox* spin = new QDoubleSpinBox();
 			spin->setPrefix(QString("Joint %1 = ") . arg(c));
 			spin->setRange(-1, 1);
-			float pos, speed;
-			j->joint_current_position(&pos, &speed);
+			float pos, speed, force_torque[6], motor_torque;
+			j->joint_current_position(&pos, &speed, force_torque, &motor_torque);
 			spin->setValue(pos);
 			spin->setSingleStep(0.02);
 			joint_spins[c] = spin;
@@ -396,8 +396,8 @@ public:
 		for (int c=0; c<(int)the_robot->joints.size(); ++c) {
 			shared_ptr<Joint> j = the_robot->joints[c];
 			if (!j) continue;
-			float pos, speed;
-			j->joint_current_position(&pos, &speed);
+			float pos, speed, force_torque[6], motor_torque;
+			j->joint_current_position(&pos, &speed, force_torque, &motor_torque);
 			joint_labels[c]->setText(QString("%1 %2") . arg(j->joint_name.c_str()) . arg(pos, 0, 'f', 3));
 			QDoubleSpinBox* spin = joint_spins[c];
 			float p = spin->value();

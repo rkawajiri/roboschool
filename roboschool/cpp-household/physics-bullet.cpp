@@ -504,7 +504,7 @@ void Joint::set_servo_target(float target_pos, float target_speed, float kp, flo
 	torque_need_repeat = false;
 }
 
-void Joint::joint_current_position(float* pos, float* speed)
+void Joint::joint_current_position(float* pos, float* speed, float* force_torque, float* motor_torque)
 {
 	shared_ptr<Robot> r = robot.lock();
 	shared_ptr<World> w = wref.lock();
@@ -515,6 +515,8 @@ void Joint::joint_current_position(float* pos, float* speed)
 	b3GetJointState(w->client, status_handle, bullen_joint_n, &state);
 	*pos = state.m_jointPosition;
 	*speed = state.m_jointVelocity;
+    std::copy(state.m_jointForceTorque, state.m_jointForceTorque+6, force_torque);
+    *motor_torque = state.m_jointMotorTorque;
 }
 
 void Joint::reset_current_position(float pos, float vel)
