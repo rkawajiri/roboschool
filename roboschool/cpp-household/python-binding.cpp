@@ -261,6 +261,14 @@ struct Joint {
 	    jref->joint_current_position(&pos, &speed, force_torque, &motor_torque);
 	    return make_tuple(pos, speed);
 	}
+	boost::python::tuple current_force_torque()
+	{
+	    float pos, speed, force_torque[6], motor_torque;
+	    jref->joint_current_position(&pos, &speed, force_torque, &motor_torque);
+
+	    return make_tuple(boost::python::list(force_torque), motor_torque);
+	}
+
 	boost::python::tuple current_relative_position()
 	{
 		float pos, speed, force_torque[6], motor_torque;
@@ -670,6 +678,7 @@ void cpp_household_init()
 	.def("set_target_speed", &Joint::set_target_speed)
 	.def("set_motor_torque", &Joint::set_motor_torque)
 	.def("current_position", &Joint::current_position)
+	.def("current_force_torque", &Joint::current_force_torque)
 	.def("current_relative_position", &Joint::current_relative_position)
 	.def("reset_current_position", &Joint::reset_current_position)
 	//.def("reset_current_relative_position", &Joint::reset_current_relative_position)
