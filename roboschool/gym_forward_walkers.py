@@ -38,7 +38,10 @@ class RoboschoolForwardWalkersBase(RoboschoolMujocoXmlEnv, SharedMemoryClientEnv
             j.set_motor_torque( self.power*j.power_coef*float(np.clip(a[n], -1, +1)) )
 
     def calc_state(self):
-        j = np.array([j.current_relative_position() for j in self.ordered_joints], dtype=np.float32).flatten()
+        ft = np.array([jt.current_force_torque()[0] for jt in self.ordered_joints]).flatten()
+        mt = np.array([jt.current_force_torque()[1] for jt in self.ordered_joints]).flatten()
+        
+        j = np.array([jt.current_relative_position() for jt in self.ordered_joints], dtype=np.float32).flatten()
         # even elements [0::2] position, scaled to -1..+1 between limits
         # odd elements  [1::2] angular speed, scaled to show -1..+1
         self.joint_speeds = j[1::2]
@@ -68,7 +71,7 @@ class RoboschoolForwardWalkersBase(RoboschoolMujocoXmlEnv, SharedMemoryClientEnv
             np.sin(angle_to_target), np.cos(angle_to_target),
             0.3*vx, 0.3*vy, 0.3*vz,    # 0.3 is just scaling typical speed into -1..+1, no physical sense here
             r, p], dtype=np.float32)
-        return np.clip( np.concatenate([more] + [j] + [self.feet_contact]), -5, +5)
+        return np.clip( np.concatenate([more] + [j] + [ft] + [mt] + [self.feet_contact]), -5, +5)
 
     def calc_potential(self):
         # progress in potential field is speed*dt, typical speed is about 2-3 meter per second, this potential will change 2-3 per frame (not per second),
@@ -175,7 +178,7 @@ class RoboschoolHumanoid(RoboschoolForwardWalkersBase):
     foot_list = ["right_foot", "left_foot"]  # "left_hand", "right_hand"
 
     def __init__(self):
-        RoboschoolForwardWalkersBase.__init__(self, 'humanoid_symmetric.xml', 'torso', action_dim=17, obs_dim=44, power=0.41)
+        RoboschoolForwardWalkersBase.__init__(self, 'humanoid_symmetric.xml', 'torso', action_dim=17, obs_dim=163, power=0.41)
         # 17 joints, 4 of them important for walking (hip, knee), others may as well be turned off, 17/4 = 4.25
         self.electricity_cost  = 4.25*RoboschoolForwardWalkersBase.electricity_cost
         self.stall_torque_cost = 4.25*RoboschoolForwardWalkersBase.stall_torque_cost
